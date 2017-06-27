@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
-enum ErrType { VID_INIT, WIN_CREATE };
+enum ErrType { VID_INIT, WIN_CREATE, REND_CREATE };
 void ErrorMsg ( ErrType );
 
 const int SCREEN_WIDTH = 640;
@@ -11,6 +11,7 @@ int main (int argc, char **args)
 {
 	SDL_Window* window = nullptr;
 	SDL_Surface* screenSurface = nullptr;
+	SDL_Renderer *renderer = nullptr;
 
 	if (SDL_Init( SDL_INIT_VIDEO ) < 0) ErrorMsg( VID_INIT );
 	else
@@ -27,6 +28,9 @@ int main (int argc, char **args)
 		
 		else
 		{
+			renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED );
+			if (renderer == nullptr) ErrorMsg( REND_CREATE );
+			
 			screenSurface = SDL_GetWindowSurface( window );
 			SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0x00, 0xFF, 0x00 ) );
 			SDL_UpdateWindowSurface( window );
@@ -50,6 +54,11 @@ void ErrorMsg( ErrType error ) {
 			
 		case WIN_CREATE:
 			printf( "Window creation error: %s\n", SDL_GetError() );
+			SDL_Quit();
+			break;
+			
+		case REND_CREATE:
+			printf( "Renderer creation error: %s\n", SDL_GetError() );
 			SDL_Quit();
 			break;
 	}
